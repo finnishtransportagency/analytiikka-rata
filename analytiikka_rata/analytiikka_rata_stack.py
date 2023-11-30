@@ -20,10 +20,7 @@ from constructs import Construct
 
 from analytiikka_rata.analytiikka_rata_stage import AnalytiikkaRataStage
 
-"""
-CICD stack
 
-"""
 class AnalytiikkaRataStack(Stack):
 
     def __init__(self,
