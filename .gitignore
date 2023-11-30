@@ -1,3 +1,17 @@
+*.swp
+package-lock.json
+__pycache__
+.pytest_cache
+.venv
+*.egg-info
+
+# CDK asset staging directory
+.cdk.staging
+cdk.out
+cdk.context.json
+*.tabl.json
+
+
 # VSCode extension
 
 # Store launch config in repo but not settings
@@ -33,15 +47,10 @@ bin/*.d.ts
 bin/*.js
 test/*.d.ts
 test/*.js
+/.versionrc.json
 
 # We don't want tsconfig at the root
 /tsconfig.json
-
-# CDK Context & Staging files
-cdk.context.json
-.cdk.staging/
-cdk.out/
-*.tabl.json
 
 # Yarn error log
 yarn-error.log
@@ -53,4 +62,3 @@ yarn-error.log
 .c9
 .nzm-*
 
-/.versionrc.json
