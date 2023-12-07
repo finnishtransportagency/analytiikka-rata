@@ -21,7 +21,7 @@ Apukoodit glue- ajojen luontiin
 """
 
 
-
+# TODO: SPARK UI testaamatta
 
 
 """
@@ -148,8 +148,14 @@ class PythonSparkGlueJob(Construct):
                  arguments: dict = None,
                  connections: list = None,
                  enable_spark_ui: bool = False,
+                 spark_log_bucket: aws_s3.IBucket = None,
+                 spark_log_prefix: str = None,
                  schedule: str = None,
-                 schedule_description: str = None
+                 schedule_description: str = None,
+                 enable_metrics: bool = True,
+                 enable_continuous_logging: bool = True,
+                 enable_bookmark: bool = False,
+                 temp_bucket_name: str = None
                  ):
         super().__init__(scope, id)
 
@@ -163,28 +169,66 @@ class PythonSparkGlueJob(Construct):
             destination_key_prefix = path
         )
 
+        default_arguments = arguments.copy()
+        if enable_metrics:
+            if default_arguments == None:
+                default_arguments = {
+                    "--enable-metrics": ""
+                }
+            else:
+                default_arguments["--enable-metrics"] = ""
+        if enable_bookmark:
+            if default_arguments == None:
+                default_arguments = {
+                    "--job-bookmark-option": "job-bookmark-enable"
+                }
+            else:
+                default_arguments["--job-bookmark-option"] = "job-bookmark-enable"
+        if enable_continuous_logging:
+            if default_arguments == None:
+                default_arguments = {
+                    "--enable-continuous-cloudwatch-log": "true",
+                    "--enable-continuous-log-filter": "false"
+                }
+            else:
+                default_arguments["--enable-continuous-cloudwatch-log"] = "true"
+                default_arguments["--enable-continuous-log-filter"] = "false"
+
+        if temp_bucket_name != None and temp_bucket_name != "":
+            if default_arguments == None:
+                default_arguments = {
+                    "--TempDir": f"s3//{temp_bucket_name}/{id}"
+                }
+            else:
+                default_arguments["--TempDir"] = f"s3//{temp_bucket_name}/{id}"
+
+        print("default arguments")
+        print(default_arguments)
+
         self.job = aws_glue_alpha.Job(self, 
-                                           id = id,
-                                           job_name = id,
-                                           spark_ui = aws_glue_alpha.SparkUIProps(
-                                               enabled = enable_spark_ui
-                                           ),
-                                           executable = aws_glue_alpha.JobExecutable.python_etl(
-                                               glue_version = get_version(version),
-                                               python_version = aws_glue_alpha.PythonVersion.THREE,
-                                               #script = aws_glue_alpha.Code.from_asset(get_path(path))
-                                               script = aws_glue_alpha.Code.from_bucket(deployment.deployed_bucket, f"{path}/{index}")
-                                           ),
-                                           description = description,
-                                           default_arguments = arguments,
-                                           role = role,
-                                           worker_type = get_worker_type(worker),
-                                           worker_count = 2,
-                                           max_retries = 0,
-                                           timeout = get_timeout(timeout_min),
-                                           max_concurrent_runs = 2,
-                                           connections = connections
-                                           )
+                                      id = id,
+                                      job_name = id,
+                                      spark_ui = aws_glue_alpha.SparkUIProps(
+                                          enabled = enable_spark_ui,
+                                          bucket = spark_log_bucket,
+                                          prefix = spark_log_prefix
+                                      ),
+                                      executable = aws_glue_alpha.JobExecutable.python_etl(
+                                          glue_version = get_version(version),
+                                          python_version = aws_glue_alpha.PythonVersion.THREE,
+                                          #script = aws_glue_alpha.Code.from_asset(get_path(path))
+                                          script = aws_glue_alpha.Code.from_bucket(deployment.deployed_bucket, f"{path}/{index}")
+                                      ),
+                                      description = description,
+                                      default_arguments = default_arguments,
+                                      role = role,
+                                      worker_type = get_worker_type(worker),
+                                      worker_count = 2,
+                                      max_retries = 0,
+                                      timeout = get_timeout(timeout_min),
+                                      max_concurrent_runs = 1,
+                                      connections = connections
+                                     )
 
         add_tags(self.job, tags, project_tag = project_tag)
 
@@ -194,7 +238,7 @@ class PythonSparkGlueJob(Construct):
             self.trigger = aws_glue.CfnTrigger(self,
                                         id = trigger_name,
                                         actions = [aws_glue.CfnTrigger.ActionProperty(
-                                            arguments = arguments,
+                                            # arguments = arguments,
                                             job_name = id,
                                             timeout = timeout_min
                                             )
