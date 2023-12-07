@@ -7,11 +7,12 @@ from aws_cdk import (
     Duration,
     BundlingOutput,
     aws_iam,
-    aws_ec2,
-    Tags
+    aws_ec2
 )
 
 from constructs import Construct
+
+from stack.helper_tags import add_tags
 
 
 """
@@ -59,14 +60,6 @@ class LambdaProperties:
 
 
 
-"""
-Lisää tagit
-"""
-def add_tags(function, tags):
-    if tags:
-        for _t in tags:
-            for k, v in _t.items():
-                Tags.of(function).add(k, v, apply_to_launched_instances = True, priority = 300)
 
 
 """
@@ -99,6 +92,7 @@ def get_pythonruntime(runtime: str):
         elif runtime == "3.12":
             lambda_runtime = aws_lambda.Runtime.PYTHON_3_12
     return(lambda_runtime)
+
 
 def get_noderuntime(runtime: str):
     lambda_runtime = aws_lambda.Runtime.NODEJS_18_X
@@ -156,6 +150,7 @@ class PythonLambdaFunction(Construct):
                  description: str,
                  role: aws_iam.Role,
                  props: LambdaProperties,
+                 project_tag: str,
                  runtime: str = None
                  ):
         super().__init__(scope, id)
@@ -180,7 +175,7 @@ class PythonLambdaFunction(Construct):
             log_retention = aws_logs.RetentionDays.THREE_MONTHS
             )
 
-        add_tags(self.function, props.tags)
+        add_tags(self.function, props.tags, project_tag = project_tag)
         add_schedule(self, self.function, id, props.schedule)
 
 
@@ -205,9 +200,11 @@ class JavaLambdaFunction(Construct):
                  handler: str,
                  role: aws_iam.Role,
                  props: LambdaProperties,
+                 project_tag: str,
                  runtime: str = None
                  ):
         super().__init__(scope, id)
+
 
         func_code = aws_lambda.Code.from_asset(path = path,
                                                bundling = {
@@ -239,7 +236,7 @@ class JavaLambdaFunction(Construct):
                                             role = role
                                            )
         
-        add_tags(self.function, props.tags)
+        add_tags(self.function, props.tags, project_tag = project_tag)
         add_schedule(self, self.function, id, props.schedule)
 
 
@@ -260,6 +257,7 @@ class NodejsLambdaFunction(Construct):
                  description: str,
                  role: aws_iam.Role,
                  props: LambdaProperties,
+                 project_tag: str,
                  runtime: str = None
                  ):
         super().__init__(scope, id)
@@ -281,7 +279,7 @@ class NodejsLambdaFunction(Construct):
                                             role = role
                                            )
         
-        add_tags(self.function, props.tags)
+        add_tags(self.function, props.tags, project_tag = project_tag)
         add_schedule(self, self.function, id, props.schedule)
 
 

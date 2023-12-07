@@ -13,6 +13,8 @@ import os
 
 from constructs import Construct
 
+from stack.helper_tags import add_tags
+
 
 """
 Apukoodit glue- ajojen luontiin
@@ -20,14 +22,6 @@ Apukoodit glue- ajojen luontiin
 
 
 
-"""
-Lisää tagit
-"""
-def add_tags(job, tags):
-    if tags:
-        for _t in tags:
-            for k, v in _t.items():
-                Tags.of(job).add(k, v, apply_to_launched_instances = True, priority = 300)
 
 
 """
@@ -91,12 +85,14 @@ class GlueJdbcConnection(Construct):
     Glue connection
     """
     def __init__(self,
-                 scope: Construct, 
-                 id: str, 
+                 scope: Construct,
+                 id: str,
+                 project_tag: str,
                  description: str = None,
                  vpc: any = None,
                  security_groups: list = None,
-                 properties: dict = None
+                 properties: dict = None,
+                 tags: dict = None
                  ):
         super().__init__(scope, id)
 
@@ -112,6 +108,8 @@ class GlueJdbcConnection(Construct):
                                                     security_groups = security_groups,
                                                     subnet = self.subnets.subnets[0]
                                                     )
+        add_tags(self.connection, tags, project_tag = project_tag)
+
 
 
 
@@ -141,6 +139,7 @@ class PythonSparkGlueJob(Construct):
                  index: str,
                  script_bucket: aws_s3.Bucket,
                  timeout_min: any,
+                 project_tag: str,
                  description: str = None,
                  worker: str = None,
                  version: str = None,
@@ -187,7 +186,7 @@ class PythonSparkGlueJob(Construct):
                                            connections = connections
                                            )
 
-        add_tags(self.job, tags)
+        add_tags(self.job, tags, project_tag = project_tag)
 
         if schedule != None and schedule != "":
             trigger_name = f"{id}-trigger"
@@ -206,7 +205,7 @@ class PythonSparkGlueJob(Construct):
                                         schedule = schedule,
                                         start_on_creation = False
                                        )
-            add_tags(self.trigger, tags)
+            add_tags(self.trigger, tags, project_tag = project_tag)
 
 
 
@@ -214,9 +213,7 @@ class PythonSparkGlueJob(Construct):
 
 
 
-"""
-TODO: EI TESTATTU
-"""
+
 class PythonShellGlueJob(Construct):
 
     def __init__(self,
@@ -226,6 +223,7 @@ class PythonShellGlueJob(Construct):
                  index: str,
                  script_bucket: aws_s3.Bucket,
                  timeout_min: int,
+                 project_tag: str,
                  description: str = None,
                  role: aws_iam.Role = None,
                  tags: dict = None,
@@ -278,7 +276,7 @@ class PythonShellGlueJob(Construct):
                                            connections = connections
                                            )
 
-        add_tags(self.job, tags)
+        add_tags(self.job, tags, project_tag = project_tag)
 
         if schedule != None and schedule != "":
             trigger_name = f"{id}-trigger"
@@ -297,6 +295,6 @@ class PythonShellGlueJob(Construct):
                                         schedule = schedule,
                                         start_on_creation = False
                                        )
-            add_tags(self.trigger, tags)
+            add_tags(self.trigger, tags, project_tag = project_tag)
 
 

@@ -1,58 +1,60 @@
+# analytiikka-rata
 
-# Welcome to your CDK Python project!
 
-This is a blank project for CDK development with Python.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+Hakemistorakenne:
 
-This project is set up like a standard Python project.  The initialization
-process also creates a virtualenv within this project, stored under the `.venv`
-directory.  To create the virtualenv it assumes that there is a `python3`
-(or `python` for Windows) executable in your path with access to the `venv`
-package. If for any reason the automatic creation of the virtualenv fails,
-you can create the virtualenv manually.
+stack/
 
-To manually create a virtualenv on MacOS and Linux:
+analytiikka_stack.py  cicd stack
+analytiikka_stage.py  pipeline staget (= dev/prod)
+analytiikka_services_stack.py  stage sisältämät palvelut. Uudet asiat lisätään tänne
+helper_glue.py  Apukoodi Glue- ajojen luontiin
+helper_lambda.py  Apukoodi Lambdojen luontiin
+helper_parameter.py  Apukoodi resurssien ympäristökohtaisten parametrien käyttöön
+helper_tags.py  Apukoodi Tagien lisäykseen
 
-```
-$ python3 -m venv .venv
-```
+lambda/xxx/  Jokaiselle lambdalle oma hakemisto. Jos python, hakemistossa pitää olla requirements.txt mutta se voi olla tyhjä jos ei tarvita. Testattu python, Java, node. Layerit eii testattu, lisäkirjastot ei testattu. Vpc ok.
+lambda/testi1/  Python testi
+lambda/servicenow/  Servicenow api lukija, Java
 
-After the init process completes and the virtualenv is created, you can use the following
-step to activate your virtualenv.
+glue/xxx/  Jokaiselle glue- jobille oma hakemisto. Python shell ja spark testattu. Connectin luonti ok, iimport eii testattu.
 
-```
-$ source .venv/bin/activate
-```
+lambda/xxx/ ja glue/xxx/ hakemistoihin voi luoda xxx_parameters.json nimisen tiedoston josta luetaan helposti kyseisen lambdan/jobin ympäristökohtaiset parametrit.
+Katso lisätiiedot stack/helper_parameter.py
 
-If you are a Windows platform, you would activate the virtualenv like this:
 
-```
-% .venv\Scripts\activate.bat
-```
 
-Once the virtualenv is activated, you can install the required dependencies.
+Asennus:
 
-```
-$ pip install -r requirements.txt
-```
+Profiileihin kopioitu väyläpilven tilapäiset kredentiaalit
 
-At this point you can now synthesize the CloudFormation template for this code.
+Secret github- yhteyttä varten
+aws secretsmanager create-secret --name analytiikka-github-token --secret-string <github token> --profile dev_LatausalueAdmin
 
-```
-$ cdk synth
-```
+Tuotantotili parametrista
+aws ssm put-parameter --name analytiikka-prod-account --value <prod account id> --profile dev_LatausalueAdmin
+aws ssm put-parameter --name analytiikka-prod-account --value <prod account id> --profile prod_LatausalueAdmin
 
-To add additional dependencies, for example other CDK libraries, just add
-them to your `setup.py` file and rerun the `pip install -r requirements.txt`
-command.
+Bootstrap kerran molemmille tileille
+npx cdk bootstrap aws://DEV-ACCOUNT-ID/eu-west-1 --cloudformation-execution-policies "arn:aws:iam::aws:policy/AdministratorAccess" --profile dev_LatausalueAdmin
 
-## Useful commands
+npx cdk bootstrap aws://PROD-ACCOUNT-ID/eu-west-1 --trust DEV-ACCOUNT-ID --cloudformation-execution-policies "arn:aws:iam::aws:policy/AdministratorAccess" --profile prod_LatausalueAdmin
 
- * `cdk ls`          list all stacks in the app
- * `cdk synth`       emits the synthesized CloudFormation template
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk docs`        open CDK documentation
+git commit &  push
 
-Enjoy!
+npx cdk deploy --profile dev_LatausalueAdmin
+
+
+
+HUOM: cdk synth luo cdk.context.json tiedoston jota ei tallenneta gittiin.
+
+
+Normaali käyttö:
+
+git push master- branshiin käynnistää pipelinen joka asentaa kaiken.
+
+
+
+https://github.com/aws-samples/aws-cdk-examples/tree/master/python
+
