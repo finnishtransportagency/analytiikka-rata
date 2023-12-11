@@ -125,7 +125,7 @@ class AnalytiikkaServicesStack(Stack):
         #                      description = "Makes parquet-files from wav.gz and json",
         #                      role = lambda_role,
         #                      runtime = "3.7",
-        #                      layers = [ None ],
+        #                      layers = [ layer_numpy_pandas_pyarrow ],
         #                      props = LambdaProperties(timeout_min = 1,
         #                                               memory_mb = 512,
         #                                               environment = {
@@ -139,7 +139,7 @@ class AnalytiikkaServicesStack(Stack):
         #                                                   "SAMPLE_MAX_LENGTH": "15",
         #                                                   "TOO_LONG_PREFIX":   "too-long/"
         #                                               },
-        #                                               securitygroups = [ layer_numpy_pandas_pyarrow ]
+        #                                               securitygroups = [ lambda_securitygroup ]
         #                                              )
         #                     )
         # 
