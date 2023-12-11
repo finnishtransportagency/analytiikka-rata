@@ -101,12 +101,13 @@ class AnalytiikkaServicesStack(Stack):
 
 
 
-        # VAIHDEDATA
+        # # VAIHDEDATA POHJA
         # # Layer
         # layer_numpy_pandas_pyarrow_asset = BuildPyLayerAsset.from_pypi(self, "NumpyPandasPyarrowLayerAsset",
         #     pypi_requirements=["numpy", "pandas", "pyarrow"],
         #     py_runtime=aws_lambda.Runtime.PYTHON_3_7,
         # )
+        # 
         # layer_numpy_pandas_pyarrow = aws_lambda.LayerVersion(
         #     self,
         #     id = "NumpyPandasPyarrowLayer",
@@ -141,6 +142,25 @@ class AnalytiikkaServicesStack(Stack):
         #                                               securitygroups = [ layer_numpy_pandas_pyarrow ]
         #                                              )
         #                     )
+        # 
+        # # Oikeudet toisen tilin bukettiin
+        # vaihdedata_process_eventsignal.function.add_to_role_policy(
+        #     aws_iam.PolicyStatement(
+        #         effect = aws_iam.Effect.ALLOW,
+        #         actions = [ "s3:GetObject*",
+        #                     "s3:DeleteObject*",
+        #                     "s3:PutObject",
+        #                     "s3:GetBucket*",
+        #                     "s3:ListAllMyBuckets",
+        #                     "s3:ListBucket"
+        #                    ],
+        #         resources = [
+        #             f"arn:aws:s3:::rata-vaihdedata-dw-{environment}/*'",
+        #             f"arn:aws:s3:::rata-vaihdedata-raw-{environment}/*'"
+        #         ]
+        #     )
+        # )
+        # 
         # # Bucket lookup
         # vaihdedata_source_bucket = aws_s3.Bucket.from_bucket_name(self, "vaihdedata-source-bucket", bucket_name = f"rata-vaihdedata-vrfleetcare-vayla-{environment}")
         # 
