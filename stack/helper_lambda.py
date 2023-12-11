@@ -45,7 +45,8 @@ class LambdaProperties:
                  memory_mb: int = None, 
                  environment: dict = None, 
                  tags: dict = None, 
-                 schedule: str = None):
+                 schedule: str = None
+                 ):
         self.vpc = vpc
         self.subnets = None
         if vpc != None:
@@ -151,7 +152,8 @@ class PythonLambdaFunction(Construct):
                  role: aws_iam.Role,
                  props: LambdaProperties,
                  project_tag: str,
-                 runtime: str = None
+                 runtime: str = None,
+                 layers: list[aws_lambda.LayerVersion] = None
                  ):
         super().__init__(scope, id)
 
@@ -172,7 +174,8 @@ class PythonLambdaFunction(Construct):
             timeout = props.timeout_min,
             memory_size = props.memory_mb,
             environment = props.environment,
-            log_retention = aws_logs.RetentionDays.THREE_MONTHS
+            log_retention = aws_logs.RetentionDays.THREE_MONTHS,
+            layers = layers
             )
 
         add_tags(self.function, props.tags, project_tag = project_tag)

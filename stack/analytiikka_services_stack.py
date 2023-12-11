@@ -3,6 +3,7 @@ from aws_cdk import (
     aws_ec2,
     aws_s3,
     aws_iam,
+    aws_lambda_event_sources,
     aws_secretsmanager,
     RemovalPolicy
 )
@@ -10,6 +11,7 @@ from aws_cdk import (
 from constructs import Construct
 
 from stack.helper_lambda import *
+from stack.helper_lambda_layer import *
 from stack.helper_glue import *
 from stack.helper_parameter import *
 
@@ -97,6 +99,68 @@ class AnalytiikkaServicesStack(Stack):
         #
 
 
+
+
+        # VAIHDEDATA
+        # # Layer
+        # layer_numpy_pandas_pyarrow_asset = BuildPyLayerAsset.from_pypi(self, "NumpyPandasPyarrowLayerAsset",
+        #     pypi_requirements=["numpy", "pandas", "pyarrow"],
+        #     py_runtime=aws_lambda.Runtime.PYTHON_3_7,
+        # )
+        # layer_numpy_pandas_pyarrow = aws_lambda.LayerVersion(
+        #     self,
+        #     id = "NumpyPandasPyarrowLayer",
+        #     code = aws_lambda.Code.from_bucket(layer_numpy_pandas_pyarrow_asset.asset_bucket, layer_numpy_pandas_pyarrow_asset.asset_key),
+        #     compatible_runtimes = [aws_lambda.Runtime.PYTHON_3_7],
+        #     description ='PyPi python modules'
+        # )
+        # 
+        # # Lambda
+        # vaihdedata_process_eventsignal = PythonLambdaFunction(self,
+        #                      id = "vaihdedata_process_eventsignal",
+        #                      path = "lambda/vaihdedata_process_eventsignal",
+        #                      index = "vaihdedata_process_eventsignal.py",
+        #                      handler = "vaihdedata_process_eventsignal.lambda_handler",
+        #                      description = "Makes parquet-files from wav.gz and json",
+        #                      role = lambda_role,
+        #                      runtime = "3.7",
+        #                      layers = [ None ],
+        #                      props = LambdaProperties(timeout_min = 1,
+        #                                               memory_mb = 512,
+        #                                               environment = {
+        #                                                   "ATHENA_DATABASE":   f"vaihdedata-{environment}",
+        #                                                   "DEBUG_BUCKET":      f"rata-vaihdedata-vrfleetcare-failedinput-{environment}",
+        #                                                   "DELAY_FOR_JSON":    "1",
+        #                                                   "DEST_BUCKET":       f"rata-vaihdedata-dw-{environment}",
+        #                                                   "DEST_RAW_BUCKET":   f"rata-vaihdedata-raw-{environment}",
+        #                                                   "LIMIT_SAMPLE":      "True",
+        #                                                   "RETRY_FOR_JSON":    "10",
+        #                                                   "SAMPLE_MAX_LENGTH": "15",
+        #                                                   "TOO_LONG_PREFIX":   "too-long/"
+        #                                               },
+        #                                               securitygroups = [ layer_numpy_pandas_pyarrow ]
+        #                                              )
+        #                     )
+        # # Bucket lookup
+        # vaihdedata_source_bucket = aws_s3.Bucket.from_bucket_name(self, "vaihdedata-source-bucket", bucket_name = f"rata-vaihdedata-vrfleetcare-vayla-{environment}")
+        # 
+        # # S3 event
+        # vaihdedata_process_eventsignal.function.add_event_source(
+        #     aws_lambda_event_sources.S3EventSource(
+        #         vaihdedata_source_bucket,
+        #         events = [aws_s3.EventType.OBJECT_CREATED],
+        #         filters = [
+        #             aws_s3.NotificationKeyFilter(
+        #                 suffix = ".wav.gz"
+        #             )
+        #         ]
+        #     )
+        # )
+
+
+
+
+
         # Esimerkki 1 python lambda
         # HUOM: schedule- määritys: https://docs.aws.amazon.com/lambda/latest/dg/services-cloudwatchevents-expressions.html
 
@@ -121,35 +185,6 @@ class AnalytiikkaServicesStack(Stack):
         #                                               schedule = "0 10 20 * ? *"
         #                                              )
         #                     )
-
-        # # Servicenow: sn_customerservice_case
-        # servicenow_sn_customerservice_case = JavaLambdaFunction(self,
-        #                    id = "servicenow-sn_customerservice_case",
-        #                    description = "ServiceNow haku taululle sn_customerservice_case",
-        #                    path = "lambda/servicenow",
-        #                    jarname = "servicenow-to-s3-lambda-1.0.0-jar-with-dependencies.jar",
-        #                    handler = "com.cgi.lambda.apifetch.LambdaFunctionHandler",
-        #                    role = lambda_role,
-        #                    props = LambdaProperties(vpc = vpc,
-        #                                             timeout_min = 15,
-        #                                             memory_mb = 2048,
-        #                                             environment = {
-        #                                                 "secret_name": f"api-servicenow-{environment}",
-        #                                                 "query_string_default": "sn_customerservice_case?sysparm_query=sys_updated_onBETWEENjavascript%3Ags.daysAgoStart(3)%40javascript%3Ags.endOfYesterday()%5EORsys_created_onBETWEENjavascript%3Ags.daysAgoStart(3)%40javascript%3Ags.endOfYesterday()&sysparm_display_value=true",
-        #                                                 "query_string_date": "sn_customerservice_case?sysparm_query=sys_created_onON{DATEFILTER}@javascript:gs.dateGenerate(%27{DATEFILTER}%27,%27start%27)@javascript:gs.dateGenerate(%27{DATEFILTER}%27,%27end%27)&sysparm_display_value=true",
-        #                                                 "output_split_limit": "1500",
-        #                                                 "api_limit": "600",
-        #                                                 "output_bucket": target_bucket_name,
-        #                                                 "output_path": "servicenow",
-        #                                                 "output_filename": "sn_customerservice_case",
-        #                                                 "coordinate_transform": "true",
-        #                                                 "fullscans":""
-        #                                             },
-        #                                             tags = None,
-        #                                             securitygroups = [ lambda_securitygroup ],
-        #                                             schedule = get_parameter(path = "lambda/servicenow", environment = environment, name = "sn_customerservice_case-schedule")
-        #                                            )
-        #                   )
 
 
         # # Trex extra tags

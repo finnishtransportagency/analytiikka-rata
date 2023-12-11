@@ -1,0 +1,8 @@
+{
+    "dev": {
+        "schedule": ""
+    },
+    "prod": {
+        "schedule": "0 0 * * ? *"
+    }
+}
