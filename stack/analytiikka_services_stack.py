@@ -129,7 +129,7 @@ class AnalytiikkaServicesStack(Stack):
                              role = lambda_role,
                              runtime = "3.7",
                              project_tag = "Vaihteiden kunnonvalvonta",
-                             layers = [ layer_numpy_pandas_pyarrow ],
+                             # layers = [ layer_numpy_pandas_pyarrow ],
                              props = LambdaProperties(timeout_min = 1,
                                                       memory_mb = 512,
                                                       environment = {
