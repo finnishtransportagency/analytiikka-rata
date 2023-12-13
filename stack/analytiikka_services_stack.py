@@ -168,25 +168,25 @@ class AnalytiikkaServicesStack(Stack):
         #     )
         # )
 
-        if environment == "dev":
-            # HUOM: nyt vain dev
-
-            # Bucket lookup
-            # vaihdedata_source_bucket = aws_s3.Bucket.from_bucket_name(self, "vaihdedata-source-bucket", bucket_name = f"rata-vaihdedata-vrfleetcare-vayla-{environment}")
-            vaihdedata_source_bucket = aws_s3.Bucket.from_bucket_name(self, "vaihdedata-source-bucket", bucket_name = f"tiedonkaytto-{environment}")
-            #
-            # S3 event
-            vaihdedata_process_eventsignal.function.add_event_source(
-                aws_lambda_event_sources.S3EventSource(
-                    vaihdedata_source_bucket,
-                    events = [aws_s3.EventType.OBJECT_CREATED],
-                    filters = [
-                        aws_s3.NotificationKeyFilter(
-                            suffix = ".wav.gz"
-                        )
-                    ]
-                )
-            )
+        # if environment == "dev":
+        #     # HUOM: nyt vain dev
+        # 
+        #     # Bucket lookup
+        #     # vaihdedata_source_bucket = aws_s3.Bucket.from_bucket_name(self, "vaihdedata-source-bucket", bucket_name = f"rata-vaihdedata-vrfleetcare-vayla-{environment}")
+        #     vaihdedata_source_bucket = aws_s3.Bucket.from_bucket_name(self, "vaihdedata-source-bucket", bucket_name = f"tiedonkaytto-{environment}")
+        #     #
+        #     # S3 event
+        #     vaihdedata_process_eventsignal.function.add_event_source(
+        #         aws_lambda_event_sources.S3EventSource(
+        #             vaihdedata_source_bucket,
+        #             events = [aws_s3.EventType.OBJECT_CREATED],
+        #             filters = [
+        #                 aws_s3.NotificationKeyFilter(
+        #                     suffix = ".wav.gz"
+        #                 )
+        #             ]
+        #         )
+        #     )
 
 
 
