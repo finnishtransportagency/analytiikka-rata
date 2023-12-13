@@ -213,8 +213,7 @@ class PythonLambdaFunction(Construct):
         """
         local_bundle = PythonLambdaBundle(path = path)
         if layers != None:
-            if len(layers) > 0:
-                local_bundle = None
+            local_bundle = None
 
         func_code = aws_lambda.Code.from_asset(path = path,
                                                bundling = BundlingOptions(

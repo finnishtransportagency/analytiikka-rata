@@ -104,44 +104,45 @@ class AnalytiikkaServicesStack(Stack):
         # VAIHDEDATA POHJA
         # Layer
         layer_numpy_pandas_pyarrow_asset = BuildPyLayerAsset.from_pypi(self, "NumpyPandasPyarrowLayerAsset",
-            pypi_requirements=["numpy", "pandas", "pyarrow"],
-            py_runtime=aws_lambda.Runtime.PYTHON_3_7,
+            pypi_requirements = [ "numpy", "pandas", "pyarrow" ],
+            py_runtime = aws_lambda.Runtime.PYTHON_3_7,
         )
 
         layer_numpy_pandas_pyarrow = aws_lambda.LayerVersion(
             self,
             id = "NumpyPandasPyarrowLayer",
+            layer_version_name = "NumpyPandasPyarrowLayer",
             code = aws_lambda.Code.from_bucket(layer_numpy_pandas_pyarrow_asset.asset_bucket, layer_numpy_pandas_pyarrow_asset.asset_key),
-            compatible_runtimes = [aws_lambda.Runtime.PYTHON_3_7],
-            description ='PyPi python modules'
+            compatible_runtimes = [ aws_lambda.Runtime.PYTHON_3_7 ],
+            description = "Python modules numpy, pandas, pyarrow"
         )
 
         # Lambda
-        #vaihdedata_process_eventsignal = PythonLambdaFunction(self,
-        #                     id = "vaihdedata_process_eventsignal",
-        #                     path = "lambda/vaihdedata_process_eventsignal",
-        #                     handler = "vaihdedata_process_eventsignal.lambda_handler",
-        #                     description = "Makes parquet-files from wav.gz and json",
-        #                     role = lambda_role,
-        #                     runtime = "3.7",
-        #                     project_tag = "Vaihteiden kunnonvalvonta",
-        #                     layers = [ layer_numpy_pandas_pyarrow ],
-        #                     props = LambdaProperties(timeout_min = 1,
-        #                                              memory_mb = 512,
-        #                                              environment = {
-        #                                                  "ATHENA_DATABASE":   f"vaihdedata-{environment}",
-        #                                                  "DEBUG_BUCKET":      f"rata-vaihdedata-vrfleetcare-failedinput-{environment}",
-        #                                                  "DELAY_FOR_JSON":    "1",
-        #                                                  "DEST_BUCKET":       f"rata-vaihdedata-dw-{environment}",
-        #                                                  "DEST_RAW_BUCKET":   f"rata-vaihdedata-raw-{environment}",
-        #                                                  "LIMIT_SAMPLE":      "True",
-        #                                                  "RETRY_FOR_JSON":    "10",
-        #                                                  "SAMPLE_MAX_LENGTH": "15",
-        #                                                  "TOO_LONG_PREFIX":   "too-long/"
-        #                                              }
-        #                                             )
-        #                    )
-        # 
+        vaihdedata_process_eventsignal = PythonLambdaFunction(self,
+                             id = "vaihdedata_process_eventsignal",
+                             path = "lambda/vaihdedata_process_eventsignal",
+                             handler = "vaihdedata_process_eventsignal.lambda_handler",
+                             description = "Makes parquet-files from wav.gz and json",
+                             role = lambda_role,
+                             runtime = "3.7",
+                             project_tag = "Vaihteiden kunnonvalvonta",
+                             layers = [ layer_numpy_pandas_pyarrow ],
+                             props = LambdaProperties(timeout_min = 1,
+                                                      memory_mb = 512,
+                                                      environment = {
+                                                          "ATHENA_DATABASE":   f"vaihdedata-{environment}",
+                                                          "DEBUG_BUCKET":      f"rata-vaihdedata-vrfleetcare-failedinput-{environment}",
+                                                          "DELAY_FOR_JSON":    "1",
+                                                          "DEST_BUCKET":       f"rata-vaihdedata-dw-{environment}",
+                                                          "DEST_RAW_BUCKET":   f"rata-vaihdedata-raw-{environment}",
+                                                          "LIMIT_SAMPLE":      "True",
+                                                          "RETRY_FOR_JSON":    "10",
+                                                          "SAMPLE_MAX_LENGTH": "15",
+                                                          "TOO_LONG_PREFIX":   "too-long/"
+                                                      }
+                                                     )
+                            )
+         
         # # Oikeudet toisen tilin bukettiin
         # vaihdedata_process_eventsignal.function.add_to_role_policy(
         #     aws_iam.PolicyStatement(
