@@ -1,0 +1,1102 @@
+Collecting boto3
+  Using cached boto3-1.33.13-py3-none-any.whl (139 kB)
+Collecting botocore
+  Using cached botocore-1.33.13-py3-none-any.whl (11.8 MB)
+Collecting numpy
+  Using cached numpy-1.26.2-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (18.2 MB)
+Collecting pandas
+  Using cached pandas-2.1.4-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (12.2 MB)
+Collecting pyarrow
+  Using cached pyarrow-14.0.1-cp311-cp311-manylinux_2_28_x86_64.whl (38.0 MB)
+Collecting jmespath<2.0.0,>=0.7.1
+  Using cached jmespath-1.0.1-py3-none-any.whl (20 kB)
+Collecting s3transfer<0.9.0,>=0.8.2
+  Using cached s3transfer-0.8.2-py3-none-any.whl (82 kB)
+Collecting python-dateutil<3.0.0,>=2.1
+  Using cached python_dateutil-2.8.2-py2.py3-none-any.whl (247 kB)
+Collecting urllib3<2.1,>=1.25.4
+  Using cached urllib3-2.0.7-py3-none-any.whl (124 kB)
+Collecting pytz>=2020.1
+  Using cached pytz-2023.3.post1-py2.py3-none-any.whl (502 kB)
+Collecting tzdata>=2022.1
+  Using cached tzdata-2023.3-py2.py3-none-any.whl (341 kB)
+Collecting six>=1.5
+  Using cached six-1.16.0-py2.py3-none-any.whl (11 kB)
+Installing collected packages: pytz, urllib3, tzdata, six, numpy, jmespath, python-dateutil, pyarrow, pandas, botocore, s3transfer, boto3
+Successfully installed boto3-1.33.13 botocore-1.33.13 jmespath-1.0.1 numpy-1.26.2 pandas-2.1.4 pyarrow-14.0.1 python-dateutil-2.8.2 pytz-2023.3.post1 s3transfer-0.8.2 six-1.16.0 tzdata-2023.3 urllib3-2.0.7
+Bundling asset analytiikka-rata-stack/analytiikka-rata-dev/analytiikka-rata-services-stack-dev/vaihdedata_process_eventsignal/vaihdedata_process_eventsignal/Code/Stage...
+main: dev account = 047468662508
+main: prod account = 945118528855
+stage dev: account = '047468662508'
+stage dev: region = 'eu-west-1'
+services dev: account = '047468662508', region = 'eu-west-1'
+source = /vayla/git/analytiikka-rata/lambda/vaihdedata_process_eventsignal
+source = '/vayla/git/analytiikka-rata/lambda/vaihdedata_process_eventsignal'
+target = '/vayla/git/analytiikka-rata/cdk.out/asset.c9fd55acbe04dde150cf083335212dce6c4c06cc9279eec8e81c6ab07eb34a5e'
+pip return = 0
+pwd return = 0
+pwd stdout = b'/vayla/git/analytiikka-rata\n'
+pwd stdout = b''
+ls return = 0
+ls stdout = b'total 40\n-rw-r--r-- 1 isto isto    36 2023-12-12 15:09 requirements.txt\n-rw-r--r-- 1 isto isto   100 2023-12-11 12:37 vaihdedata_process_eventsignal_parameters.json\n-rw-r--r-- 1 isto isto 30946 2023-12-11 12:38 vaihdedata_process_eventsignal.py\n'
+ls stdout = b''
+cp return = 1
+cp stdout = b''
+cp stdout = b"cp: cannot stat '/vayla/git/analytiikka-rata/lambda/vaihdedata_process_eventsignal/*': No such file or directory\n"
+stage prod: account = '945118528855'
+stage prod: region = 'eu-west-1'
+services prod: account = '945118528855', region = 'eu-west-1'
+Resources:
+  analytiikkaratapipePipelineArtifactsBucketEncryptionKey44BC3117:
+    Type: AWS::KMS::Key
+    Properties:
+      KeyPolicy:
+        Statement:
+          - Action: kms:*
+            Effect: Allow
+            Principal:
+              AWS: arn:aws:iam::047468662508:root
+            Resource: "*"
+          - Action:
+              - kms:Decrypt
+              - kms:DescribeKey
+            Effect: Allow
+            Principal:
+              AWS:
+                - Fn::Join:
+                    - ""
+                    - - "arn:"
+                      - Ref: AWS::Partition
+                      - :iam::047468662508:role/cdk-hnb659fds-deploy-role-047468662508-eu-west-1
+                - Fn::Join:
+                    - ""
+                    - - "arn:"
+                      - Ref: AWS::Partition
+                      - :iam::945118528855:role/cdk-hnb659fds-deploy-role-945118528855-eu-west-1
+            Resource: "*"
+        Version: "2012-10-17"
+      Tags:
+        - Key: Administrator
+          Value: Analytiikkapalvelukeskus
+        - Key: Repository
+          Value: analytiikka-rata
+        - Key: System ID
+          Value: "953"
+        - Key: System Owner
+          Value: Vayla
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/Pipeline/ArtifactsBucketEncryptionKey/Resource
+  analytiikkaratapipePipelineArtifactsBucketEncryptionKeyAlias7CB4CA47:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: alias/codepipeline-analytiikka-rata-stack-analytiikka-rata-pipe-pipeline-0e864c07
+      TargetKeyId:
+        Fn::GetAtt:
+          - analytiikkaratapipePipelineArtifactsBucketEncryptionKey44BC3117
+          - Arn
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/Pipeline/ArtifactsBucketEncryptionKeyAlias/Resource
+  analytiikkaratapipePipelineArtifactsBucket07F5784C:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              KMSMasterKeyID:
+                Fn::GetAtt:
+                  - analytiikkaratapipePipelineArtifactsBucketEncryptionKey44BC3117
+                  - Arn
+              SSEAlgorithm: aws:kms
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      Tags:
+        - Key: Administrator
+          Value: Analytiikkapalvelukeskus
+        - Key: Repository
+          Value: analytiikka-rata
+        - Key: System ID
+          Value: "953"
+        - Key: System Owner
+          Value: Vayla
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/Pipeline/ArtifactsBucket/Resource
+  analytiikkaratapipePipelineArtifactsBucketPolicy7210287A:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: analytiikkaratapipePipelineArtifactsBucket07F5784C
+      PolicyDocument:
+        Statement:
+          - Action: s3:*
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"
+            Effect: Deny
+            Principal:
+              AWS: "*"
+            Resource:
+              - Fn::GetAtt:
+                  - analytiikkaratapipePipelineArtifactsBucket07F5784C
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - analytiikkaratapipePipelineArtifactsBucket07F5784C
+                        - Arn
+                    - /*
+          - Action:
+              - s3:GetBucket*
+              - s3:GetObject*
+              - s3:List*
+            Effect: Allow
+            Principal:
+              AWS:
+                - Fn::Join:
+                    - ""
+                    - - "arn:"
+                      - Ref: AWS::Partition
+                      - :iam::047468662508:role/cdk-hnb659fds-deploy-role-047468662508-eu-west-1
+                - Fn::Join:
+                    - ""
+                    - - "arn:"
+                      - Ref: AWS::Partition
+                      - :iam::945118528855:role/cdk-hnb659fds-deploy-role-945118528855-eu-west-1
+            Resource:
+              - Fn::GetAtt:
+                  - analytiikkaratapipePipelineArtifactsBucket07F5784C
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - analytiikkaratapipePipelineArtifactsBucket07F5784C
+                        - Arn
+                    - /*
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/Pipeline/ArtifactsBucket/Policy/Resource
+  analytiikkaratapipePipelineRole67B1D720:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+        Version: "2012-10-17"
+      Tags:
+        - Key: Administrator
+          Value: Analytiikkapalvelukeskus
+        - Key: Repository
+          Value: analytiikka-rata
+        - Key: System ID
+          Value: "953"
+        - Key: System Owner
+          Value: Vayla
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/Pipeline/Role/Resource
+  analytiikkaratapipePipelineRoleDefaultPolicyC50602C7:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:Abort*
+              - s3:DeleteObject*
+              - s3:GetBucket*
+              - s3:GetObject*
+              - s3:List*
+              - s3:PutObject
+              - s3:PutObjectLegalHold
+              - s3:PutObjectRetention
+              - s3:PutObjectTagging
+              - s3:PutObjectVersionTagging
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - analytiikkaratapipePipelineArtifactsBucket07F5784C
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - analytiikkaratapipePipelineArtifactsBucket07F5784C
+                        - Arn
+                    - /*
+          - Action:
+              - kms:Decrypt
+              - kms:DescribeKey
+              - kms:Encrypt
+              - kms:GenerateDataKey*
+              - kms:ReEncrypt*
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - analytiikkaratapipePipelineArtifactsBucketEncryptionKey44BC3117
+                - Arn
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - analytiikkaratapipeCodeBuildActionRole648D5672
+                  - Arn
+              - Fn::GetAtt:
+                  - analytiikkaratapipePipelineanalytiikkarataprodprodapprovalCodePipelineActionRole2EDE921C
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - "arn:"
+                    - Ref: AWS::Partition
+                    - :iam::047468662508:role/cdk-hnb659fds-deploy-role-047468662508-eu-west-1
+              - Fn::Join:
+                  - ""
+                  - - "arn:"
+                    - Ref: AWS::Partition
+                    - :iam::945118528855:role/cdk-hnb659fds-deploy-role-945118528855-eu-west-1
+        Version: "2012-10-17"
+      PolicyName: analytiikkaratapipePipelineRoleDefaultPolicyC50602C7
+      Roles:
+        - Ref: analytiikkaratapipePipelineRole67B1D720
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/Pipeline/Role/DefaultPolicy/Resource
+  analytiikkaratapipePipeline7AA54705:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      ArtifactStore:
+        EncryptionKey:
+          Id:
+            Fn::GetAtt:
+              - analytiikkaratapipePipelineArtifactsBucketEncryptionKey44BC3117
+              - Arn
+          Type: KMS
+        Location:
+          Ref: analytiikkaratapipePipelineArtifactsBucket07F5784C
+        Type: S3
+      Name: analytiikka-rata-pipe
+      RestartExecutionOnUpdate: true
+      RoleArn:
+        Fn::GetAtt:
+          - analytiikkaratapipePipelineRole67B1D720
+          - Arn
+      Stages:
+        - Actions:
+            - ActionTypeId:
+                Category: Source
+                Owner: ThirdParty
+                Provider: GitHub
+                Version: "1"
+              Configuration:
+                Owner: finnishtransportagency
+                Repo: analytiikka-rata
+                Branch: master
+                OAuthToken: "{{resolve:secretsmanager:arn:aws:secretsmanager:eu-west-1:047468662508:secret:analytiikka-github-token:SecretString:::}}"
+                PollForSourceChanges: false
+              Name: finnishtransportagency_analytiikka-rata
+              OutputArtifacts:
+                - Name: finnishtransportagency_analytiikka_rata_Source
+              RunOrder: 1
+          Name: Source
+        - Actions:
+            - ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: "1"
+              Configuration:
+                ProjectName:
+                  Ref: analytiikkaratapipePipelineBuildSynthCdkBuildProject2D5AA9CB
+                EnvironmentVariables: '[{"name":"_PROJECT_CONFIG_HASH","type":"PLAINTEXT","value":"ceccad0693d0e93ea17a2fa76afb2720e027ea1f9723013d78fd1443a2468e93"}]'
+              InputArtifacts:
+                - Name: finnishtransportagency_analytiikka_rata_Source
+              Name: Synth
+              OutputArtifacts:
+                - Name: Synth_Output
+              RoleArn:
+                Fn::GetAtt:
+                  - analytiikkaratapipeCodeBuildActionRole648D5672
+                  - Arn
+              RunOrder: 1
+          Name: Build
+        - Actions:
+            - ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: "1"
+              Configuration:
+                ProjectName:
+                  Ref: analytiikkaratapipeUpdatePipelineSelfMutation0FEDBAD3
+                EnvironmentVariables: '[{"name":"_PROJECT_CONFIG_HASH","type":"PLAINTEXT","value":"2719d502d0ccf10c8a936407e3f57bbf11db56a09c1f14cb83d39203355e977c"}]'
+              InputArtifacts:
+                - Name: Synth_Output
+              Name: SelfMutate
+              RoleArn:
+                Fn::GetAtt:
+                  - analytiikkaratapipeCodeBuildActionRole648D5672
+                  - Arn
+              RunOrder: 1
+          Name: UpdatePipeline
+        - Actions:
+            - ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: "1"
+              Configuration:
+                ProjectName:
+                  Ref: analytiikkaratapipeAssetsFileAsset1E8C35EBB
+              InputArtifacts:
+                - Name: Synth_Output
+              Name: FileAsset1
+              RoleArn:
+                Fn::GetAtt:
+                  - analytiikkaratapipeCodeBuildActionRole648D5672
+                  - Arn
+              RunOrder: 1
+            - ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Provider: CodeBuild
+                Version: "1"
+              Configuration:
+                ProjectName:
+                  Ref: analytiikkaratapipeAssetsFileAsset28B664ED9
+              InputArtifacts:
+                - Name: Synth_Output
+              Name: FileAsset2
+              RoleArn:
+                Fn::GetAtt:
+                  - analytiikkaratapipeCodeBuildActionRole648D5672
+                  - Arn
+              RunOrder: 1
+          Name: Assets
+        - Actions:
+            - ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: "1"
+              Configuration:
+                StackName: analytiikka-rata-services-stack-dev
+                Capabilities: CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn:
+                  Fn::Join:
+                    - ""
+                    - - "arn:"
+                      - Ref: AWS::Partition
+                      - :iam::047468662508:role/cdk-hnb659fds-cfn-exec-role-047468662508-eu-west-1
+                TemplateConfiguration: Synth_Output::assembly-analytiikka-rata-stack-analytiikka-rata-dev/analytiikkaratastackanalytiikkaratadevanalytiikkarataservicesstackdev091295F0.template.json.config.json
+                ActionMode: CHANGE_SET_REPLACE
+                ChangeSetName: PipelineChange
+                TemplatePath: Synth_Output::assembly-analytiikka-rata-stack-analytiikka-rata-dev/analytiikkaratastackanalytiikkaratadevanalytiikkarataservicesstackdev091295F0.template.json
+              InputArtifacts:
+                - Name: Synth_Output
+              Name: Prepare
+              RoleArn:
+                Fn::Join:
+                  - ""
+                  - - "arn:"
+                    - Ref: AWS::Partition
+                    - :iam::047468662508:role/cdk-hnb659fds-deploy-role-047468662508-eu-west-1
+              RunOrder: 1
+            - ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: "1"
+              Configuration:
+                StackName: analytiikka-rata-services-stack-dev
+                ActionMode: CHANGE_SET_EXECUTE
+                ChangeSetName: PipelineChange
+              Name: Deploy
+              RoleArn:
+                Fn::Join:
+                  - ""
+                  - - "arn:"
+                    - Ref: AWS::Partition
+                    - :iam::047468662508:role/cdk-hnb659fds-deploy-role-047468662508-eu-west-1
+              RunOrder: 2
+          Name: analytiikka-rata-dev
+        - Actions:
+            - ActionTypeId:
+                Category: Approval
+                Owner: AWS
+                Provider: Manual
+                Version: "1"
+              Name: prod-approval
+              RoleArn:
+                Fn::GetAtt:
+                  - analytiikkaratapipePipelineanalytiikkarataprodprodapprovalCodePipelineActionRole2EDE921C
+                  - Arn
+              RunOrder: 1
+            - ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: "1"
+              Configuration:
+                StackName: analytiikka-rata-services-stack-prod
+                Capabilities: CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND
+                RoleArn:
+                  Fn::Join:
+                    - ""
+                    - - "arn:"
+                      - Ref: AWS::Partition
+                      - :iam::945118528855:role/cdk-hnb659fds-cfn-exec-role-945118528855-eu-west-1
+                TemplateConfiguration: Synth_Output::assembly-analytiikka-rata-stack-analytiikka-rata-prod/analytiikkaratastackanalytiikkarataprodanalytiikkarataservicesstackprod9AA129DE.template.json.config.json
+                ActionMode: CHANGE_SET_REPLACE
+                ChangeSetName: PipelineChange
+                TemplatePath: Synth_Output::assembly-analytiikka-rata-stack-analytiikka-rata-prod/analytiikkaratastackanalytiikkarataprodanalytiikkarataservicesstackprod9AA129DE.template.json
+              InputArtifacts:
+                - Name: Synth_Output
+              Name: analytiikka-rata-services-stack-prod.Prepare
+              RoleArn:
+                Fn::Join:
+                  - ""
+                  - - "arn:"
+                    - Ref: AWS::Partition
+                    - :iam::945118528855:role/cdk-hnb659fds-deploy-role-945118528855-eu-west-1
+              RunOrder: 2
+            - ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Provider: CloudFormation
+                Version: "1"
+              Configuration:
+                StackName: analytiikka-rata-services-stack-prod
+                ActionMode: CHANGE_SET_EXECUTE
+                ChangeSetName: PipelineChange
+              Name: analytiikka-rata-services-stack-prod.Deploy
+              RoleArn:
+                Fn::Join:
+                  - ""
+                  - - "arn:"
+                    - Ref: AWS::Partition
+                    - :iam::945118528855:role/cdk-hnb659fds-deploy-role-945118528855-eu-west-1
+              RunOrder: 3
+          Name: analytiikka-rata-prod
+      Tags:
+        - Key: Administrator
+          Value: Analytiikkapalvelukeskus
+        - Key: Repository
+          Value: analytiikka-rata
+        - Key: System ID
+          Value: "953"
+        - Key: System Owner
+          Value: Vayla
+    DependsOn:
+      - analytiikkaratapipePipelineRoleDefaultPolicyC50602C7
+      - analytiikkaratapipePipelineRole67B1D720
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/Pipeline/Resource
+  analytiikkaratapipePipelineSourcefinnishtransportagencyanalytiikkarataWebhookResource6E640556:
+    Type: AWS::CodePipeline::Webhook
+    Properties:
+      Authentication: GITHUB_HMAC
+      AuthenticationConfiguration:
+        SecretToken: "{{resolve:secretsmanager:arn:aws:secretsmanager:eu-west-1:047468662508:secret:analytiikka-github-token:SecretString:::}}"
+      Filters:
+        - JsonPath: $.ref
+          MatchEquals: refs/heads/{Branch}
+      RegisterWithThirdParty: true
+      TargetAction: finnishtransportagency_analytiikka-rata
+      TargetPipeline:
+        Ref: analytiikkaratapipePipeline7AA54705
+      TargetPipelineVersion: 1
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/Pipeline/Source/finnishtransportagency_analytiikka-rata/WebhookResource
+  analytiikkaratapipePipelineBuildSynthCdkBuildProjectRoleF4291D3B:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+        Version: "2012-10-17"
+      Tags:
+        - Key: Administrator
+          Value: Analytiikkapalvelukeskus
+        - Key: Repository
+          Value: analytiikka-rata
+        - Key: System ID
+          Value: "953"
+        - Key: System Owner
+          Value: Vayla
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/Pipeline/Build/Synth/CdkBuildProject/Role/Resource
+  analytiikkaratapipePipelineBuildSynthCdkBuildProjectRoleDefaultPolicy8283063C:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Effect: Allow
+            Resource:
+              - Fn::Join:
+                  - ""
+                  - - arn:aws:logs:eu-west-1:047468662508:log-group:/aws/codebuild/
+                    - Ref: analytiikkaratapipePipelineBuildSynthCdkBuildProject2D5AA9CB
+                    - :*
+              - Fn::Join:
+                  - ""
+                  - - arn:aws:logs:eu-west-1:047468662508:log-group:/aws/codebuild/
+                    - Ref: analytiikkaratapipePipelineBuildSynthCdkBuildProject2D5AA9CB
+          - Action:
+              - codebuild:BatchPutCodeCoverages
+              - codebuild:BatchPutTestCases
+              - codebuild:CreateReport
+              - codebuild:CreateReportGroup
+              - codebuild:UpdateReport
+            Effect: Allow
+            Resource:
+              Fn::Join:
+                - ""
+                - - arn:aws:codebuild:eu-west-1:047468662508:report-group/
+                  - Ref: analytiikkaratapipePipelineBuildSynthCdkBuildProject2D5AA9CB
+                  - -*
+          - Action: "*"
+            Effect: Allow
+            Resource: "*"
+          - Action:
+              - s3:Abort*
+              - s3:DeleteObject*
+              - s3:GetBucket*
+              - s3:GetObject*
+              - s3:List*
+              - s3:PutObject
+              - s3:PutObjectLegalHold
+              - s3:PutObjectRetention
+              - s3:PutObjectTagging
+              - s3:PutObjectVersionTagging
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - analytiikkaratapipePipelineArtifactsBucket07F5784C
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - analytiikkaratapipePipelineArtifactsBucket07F5784C
+                        - Arn
+                    - /*
+          - Action:
+              - kms:Decrypt
+              - kms:DescribeKey
+              - kms:Encrypt
+              - kms:GenerateDataKey*
+              - kms:ReEncrypt*
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - analytiikkaratapipePipelineArtifactsBucketEncryptionKey44BC3117
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: analytiikkaratapipePipelineBuildSynthCdkBuildProjectRoleDefaultPolicy8283063C
+      Roles:
+        - Ref: analytiikkaratapipePipelineBuildSynthCdkBuildProjectRoleF4291D3B
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/Pipeline/Build/Synth/CdkBuildProject/Role/DefaultPolicy/Resource
+  analytiikkaratapipePipelineBuildSynthCdkBuildProject2D5AA9CB:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Cache:
+        Type: NO_CACHE
+      Description: Pipeline step analytiikka-rata-stack/Pipeline/Build/Synth
+      EncryptionKey:
+        Fn::GetAtt:
+          - analytiikkaratapipePipelineArtifactsBucketEncryptionKey44BC3117
+          - Arn
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+        ImagePullCredentialsType: CODEBUILD
+        PrivilegedMode: false
+        Type: LINUX_CONTAINER
+      ServiceRole:
+        Fn::GetAtt:
+          - analytiikkaratapipePipelineBuildSynthCdkBuildProjectRoleF4291D3B
+          - Arn
+      Source:
+        BuildSpec: |-
+          {
+            "version": "0.2",
+            "phases": {
+              "build": {
+                "commands": [
+                  "npm install -g aws-cdk",
+                  "python -m pip install -r requirements.txt",
+                  "npx cdk synth"
+                ]
+              }
+            },
+            "artifacts": {
+              "base-directory": "cdk.out",
+              "files": "**/*"
+            }
+          }
+        Type: CODEPIPELINE
+      Tags:
+        - Key: Administrator
+          Value: Analytiikkapalvelukeskus
+        - Key: Repository
+          Value: analytiikka-rata
+        - Key: System ID
+          Value: "953"
+        - Key: System Owner
+          Value: Vayla
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/Pipeline/Build/Synth/CdkBuildProject/Resource
+  analytiikkaratapipePipelineanalytiikkarataprodprodapprovalCodePipelineActionRole2EDE921C:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              AWS: arn:aws:iam::047468662508:root
+        Version: "2012-10-17"
+      Tags:
+        - Key: Administrator
+          Value: Analytiikkapalvelukeskus
+        - Key: Repository
+          Value: analytiikka-rata
+        - Key: System ID
+          Value: "953"
+        - Key: System Owner
+          Value: Vayla
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/Pipeline/analytiikka-rata-prod/prod-approval/CodePipelineActionRole/Resource
+  analytiikkaratapipeCodeBuildActionRole648D5672:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::GetAtt:
+                  - analytiikkaratapipePipelineRole67B1D720
+                  - Arn
+        Version: "2012-10-17"
+      Tags:
+        - Key: Administrator
+          Value: Analytiikkapalvelukeskus
+        - Key: Repository
+          Value: analytiikka-rata
+        - Key: System ID
+          Value: "953"
+        - Key: System Owner
+          Value: Vayla
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/CodeBuildActionRole/Resource
+  analytiikkaratapipeCodeBuildActionRoleDefaultPolicy7580EC8D:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - codebuild:BatchGetBuilds
+              - codebuild:StartBuild
+              - codebuild:StopBuild
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - analytiikkaratapipeAssetsFileAsset1E8C35EBB
+                  - Arn
+              - Fn::GetAtt:
+                  - analytiikkaratapipeAssetsFileAsset28B664ED9
+                  - Arn
+              - Fn::GetAtt:
+                  - analytiikkaratapipePipelineBuildSynthCdkBuildProject2D5AA9CB
+                  - Arn
+              - Fn::GetAtt:
+                  - analytiikkaratapipeUpdatePipelineSelfMutation0FEDBAD3
+                  - Arn
+        Version: "2012-10-17"
+      PolicyName: analytiikkaratapipeCodeBuildActionRoleDefaultPolicy7580EC8D
+      Roles:
+        - Ref: analytiikkaratapipeCodeBuildActionRole648D5672
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/CodeBuildActionRole/DefaultPolicy/Resource
+  analytiikkaratapipeUpdatePipelineSelfMutationRoleA599D552:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+        Version: "2012-10-17"
+      Tags:
+        - Key: Administrator
+          Value: Analytiikkapalvelukeskus
+        - Key: Repository
+          Value: analytiikka-rata
+        - Key: System ID
+          Value: "953"
+        - Key: System Owner
+          Value: Vayla
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/UpdatePipeline/SelfMutation/Role/Resource
+  analytiikkaratapipeUpdatePipelineSelfMutationRoleDefaultPolicy61960798:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Effect: Allow
+            Resource:
+              - Fn::Join:
+                  - ""
+                  - - arn:aws:logs:eu-west-1:047468662508:log-group:/aws/codebuild/
+                    - Ref: analytiikkaratapipeUpdatePipelineSelfMutation0FEDBAD3
+                    - :*
+              - Fn::Join:
+                  - ""
+                  - - arn:aws:logs:eu-west-1:047468662508:log-group:/aws/codebuild/
+                    - Ref: analytiikkaratapipeUpdatePipelineSelfMutation0FEDBAD3
+          - Action:
+              - codebuild:BatchPutCodeCoverages
+              - codebuild:BatchPutTestCases
+              - codebuild:CreateReport
+              - codebuild:CreateReportGroup
+              - codebuild:UpdateReport
+            Effect: Allow
+            Resource:
+              Fn::Join:
+                - ""
+                - - arn:aws:codebuild:eu-west-1:047468662508:report-group/
+                  - Ref: analytiikkaratapipeUpdatePipelineSelfMutation0FEDBAD3
+                  - -*
+          - Action:
+              - "*"
+              - cloudformation:DescribeStacks
+              - s3:ListBucket
+            Effect: Allow
+            Resource: "*"
+          - Action: sts:AssumeRole
+            Condition:
+              ForAnyValue:StringEquals:
+                iam:ResourceTag/aws-cdk:bootstrap-role:
+                  - image-publishing
+                  - file-publishing
+                  - deploy
+            Effect: Allow
+            Resource: arn:*:iam::047468662508:role/*
+          - Action:
+              - s3:GetBucket*
+              - s3:GetObject*
+              - s3:List*
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - analytiikkaratapipePipelineArtifactsBucket07F5784C
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - analytiikkaratapipePipelineArtifactsBucket07F5784C
+                        - Arn
+                    - /*
+          - Action:
+              - kms:Decrypt
+              - kms:DescribeKey
+              - kms:Encrypt
+              - kms:GenerateDataKey*
+              - kms:ReEncrypt*
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - analytiikkaratapipePipelineArtifactsBucketEncryptionKey44BC3117
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: analytiikkaratapipeUpdatePipelineSelfMutationRoleDefaultPolicy61960798
+      Roles:
+        - Ref: analytiikkaratapipeUpdatePipelineSelfMutationRoleA599D552
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/UpdatePipeline/SelfMutation/Role/DefaultPolicy/Resource
+  analytiikkaratapipeUpdatePipelineSelfMutation0FEDBAD3:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Cache:
+        Type: NO_CACHE
+      Description: Pipeline step analytiikka-rata-stack/Pipeline/UpdatePipeline/SelfMutate
+      EncryptionKey:
+        Fn::GetAtt:
+          - analytiikkaratapipePipelineArtifactsBucketEncryptionKey44BC3117
+          - Arn
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+        ImagePullCredentialsType: CODEBUILD
+        PrivilegedMode: false
+        Type: LINUX_CONTAINER
+      Name: analytiikka-rata-pipe-selfupdate
+      ServiceRole:
+        Fn::GetAtt:
+          - analytiikkaratapipeUpdatePipelineSelfMutationRoleA599D552
+          - Arn
+      Source:
+        BuildSpec: |-
+          {
+            "version": "0.2",
+            "phases": {
+              "install": {
+                "commands": [
+                  "npm install -g aws-cdk@2"
+                ]
+              },
+              "build": {
+                "commands": [
+                  "cdk -a . deploy analytiikka-rata-stack --require-approval=never --verbose"
+                ]
+              }
+            }
+          }
+        Type: CODEPIPELINE
+      Tags:
+        - Key: Administrator
+          Value: Analytiikkapalvelukeskus
+        - Key: Repository
+          Value: analytiikka-rata
+        - Key: System ID
+          Value: "953"
+        - Key: System Owner
+          Value: Vayla
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/UpdatePipeline/SelfMutation/Resource
+  analytiikkaratapipeAssetsFileRole7B379683:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              AWS: arn:aws:iam::047468662508:root
+              Service: codebuild.amazonaws.com
+        Version: "2012-10-17"
+      Tags:
+        - Key: Administrator
+          Value: Analytiikkapalvelukeskus
+        - Key: Repository
+          Value: analytiikka-rata
+        - Key: System ID
+          Value: "953"
+        - Key: System Owner
+          Value: Vayla
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/Assets/FileRole/Resource
+  analytiikkaratapipeAssetsFileRoleDefaultPolicy803C7217:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Effect: Allow
+            Resource: arn:aws:logs:eu-west-1:047468662508:log-group:/aws/codebuild/*
+          - Action:
+              - codebuild:BatchPutCodeCoverages
+              - codebuild:BatchPutTestCases
+              - codebuild:CreateReport
+              - codebuild:CreateReportGroup
+              - codebuild:UpdateReport
+            Effect: Allow
+            Resource: arn:aws:codebuild:eu-west-1:047468662508:report-group/*
+          - Action:
+              - "*"
+              - codebuild:BatchGetBuilds
+              - codebuild:StartBuild
+              - codebuild:StopBuild
+            Effect: Allow
+            Resource: "*"
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Resource:
+              - Fn::Sub: arn:${AWS::Partition}:iam::047468662508:role/cdk-hnb659fds-file-publishing-role-047468662508-eu-west-1
+              - Fn::Sub: arn:${AWS::Partition}:iam::945118528855:role/cdk-hnb659fds-file-publishing-role-945118528855-eu-west-1
+          - Action:
+              - s3:GetBucket*
+              - s3:GetObject*
+              - s3:List*
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - analytiikkaratapipePipelineArtifactsBucket07F5784C
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - analytiikkaratapipePipelineArtifactsBucket07F5784C
+                        - Arn
+                    - /*
+          - Action:
+              - kms:Decrypt
+              - kms:DescribeKey
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - analytiikkaratapipePipelineArtifactsBucketEncryptionKey44BC3117
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: analytiikkaratapipeAssetsFileRoleDefaultPolicy803C7217
+      Roles:
+        - Ref: analytiikkaratapipeAssetsFileRole7B379683
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/Assets/FileRole/DefaultPolicy/Resource
+  analytiikkaratapipeAssetsFileAsset1E8C35EBB:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Cache:
+        Type: NO_CACHE
+      Description: Pipeline step analytiikka-rata-stack/Pipeline/Assets/FileAsset1
+      EncryptionKey:
+        Fn::GetAtt:
+          - analytiikkaratapipePipelineArtifactsBucketEncryptionKey44BC3117
+          - Arn
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+        ImagePullCredentialsType: CODEBUILD
+        PrivilegedMode: false
+        Type: LINUX_CONTAINER
+      ServiceRole:
+        Fn::GetAtt:
+          - analytiikkaratapipeAssetsFileRole7B379683
+          - Arn
+      Source:
+        BuildSpec: |-
+          {
+            "version": "0.2",
+            "phases": {
+              "install": {
+                "commands": [
+                  "npm install -g cdk-assets@2"
+                ]
+              },
+              "build": {
+                "commands": [
+                  "cdk-assets --path \"assembly-analytiikka-rata-stack-analytiikka-rata-dev/analytiikkaratastackanalytiikkaratadevanalytiikkarataservicesstackdev091295F0.assets.json\" --verbose publish \"c9fd55acbe04dde150cf083335212dce6c4c06cc9279eec8e81c6ab07eb34a5e:047468662508-eu-west-1\"",
+                  "cdk-assets --path \"assembly-analytiikka-rata-stack-analytiikka-rata-prod/analytiikkaratastackanalytiikkarataprodanalytiikkarataservicesstackprod9AA129DE.assets.json\" --verbose publish \"c9fd55acbe04dde150cf083335212dce6c4c06cc9279eec8e81c6ab07eb34a5e:945118528855-eu-west-1\""
+                ]
+              }
+            }
+          }
+        Type: CODEPIPELINE
+      Tags:
+        - Key: Administrator
+          Value: Analytiikkapalvelukeskus
+        - Key: Repository
+          Value: analytiikka-rata
+        - Key: System ID
+          Value: "953"
+        - Key: System Owner
+          Value: Vayla
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/Assets/FileAsset1/Resource
+  analytiikkaratapipeAssetsFileAsset28B664ED9:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Cache:
+        Type: NO_CACHE
+      Description: Pipeline step analytiikka-rata-stack/Pipeline/Assets/FileAsset2
+      EncryptionKey:
+        Fn::GetAtt:
+          - analytiikkaratapipePipelineArtifactsBucketEncryptionKey44BC3117
+          - Arn
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:7.0
+        ImagePullCredentialsType: CODEBUILD
+        PrivilegedMode: false
+        Type: LINUX_CONTAINER
+      ServiceRole:
+        Fn::GetAtt:
+          - analytiikkaratapipeAssetsFileRole7B379683
+          - Arn
+      Source:
+        BuildSpec: |-
+          {
+            "version": "0.2",
+            "phases": {
+              "install": {
+                "commands": [
+                  "npm install -g cdk-assets@2"
+                ]
+              },
+              "build": {
+                "commands": [
+                  "cdk-assets --path \"assembly-analytiikka-rata-stack-analytiikka-rata-dev/analytiikkaratastackanalytiikkaratadevanalytiikkarataservicesstackdev091295F0.assets.json\" --verbose publish \"5bc602ecde93c947efe5899ae355f999986a1acbe610b1c0b9c468d738857555:047468662508-eu-west-1\"",
+                  "cdk-assets --path \"assembly-analytiikka-rata-stack-analytiikka-rata-prod/analytiikkaratastackanalytiikkarataprodanalytiikkarataservicesstackprod9AA129DE.assets.json\" --verbose publish \"5bc602ecde93c947efe5899ae355f999986a1acbe610b1c0b9c468d738857555:945118528855-eu-west-1\""
+                ]
+              }
+            }
+          }
+        Type: CODEPIPELINE
+      Tags:
+        - Key: Administrator
+          Value: Analytiikkapalvelukeskus
+        - Key: Repository
+          Value: analytiikka-rata
+        - Key: System ID
+          Value: "953"
+        - Key: System Owner
+          Value: Vayla
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/analytiikka-rata-pipe/Assets/FileAsset2/Resource
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Analytics: v2:deflate64:H4sIAAAAAAAA/01QSw6CMBA9C/syCpxAWbohuHBpoIxhbKGE0hjS9O7SAuLqfeY/KSRJAueo+uiYNyKWVIO9TxUXrEStzMiRDTSgpB415KrBYlNsKXlavjh7HOwvlr/6f/7AulVKOCY6DfaGszc9XCRV2otAHNMZ2KvhAidvbmyFQkni82Gv2jGqOrClkmFQwCNzz/Fb1oZkc6xYjOqNPIzZqHOhw3a1Y8U8tao/ZcuHII3emigeTT9Rh1Cu+AUlxCQyPQEAAA==
+    Metadata:
+      aws:cdk:path: analytiikka-rata-stack/CDKMetadata/Default
+Parameters:
+  BootstrapVersion:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cdk-bootstrap/hnb659fds/version
+    Description: Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]
+Rules:
+  CheckBootstrapVersion:
+    Assertions:
+      - Assert:
+          Fn::Not:
+            - Fn::Contains:
+                - - "1"
+                  - "2"
+                  - "3"
+                  - "4"
+                  - "5"
+                - Ref: BootstrapVersion
+        AssertDescription: CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.
+
+

@@ -6,6 +6,8 @@ from aws_cdk import (
     aws_logs,
     Duration,
     BundlingOutput,
+    BundlingOptions,
+    ILocalBundling,
     aws_iam,
     aws_ec2
 )
@@ -14,6 +16,10 @@ from constructs import Construct
 
 from stack.helper_tags import add_tags
 
+import jsii
+import subprocess
+import os
+import glob
 
 """
 Apukoodit lambdojen luontiin
@@ -77,7 +83,7 @@ def add_schedule(self, function, id, schedule):
         rule.add_target(aws_events_targets.LambdaFunction(function))
 
 
-def get_pythonruntime(runtime: str):
+def get_pythonruntime(runtime: str) -> aws_lambda.Runtime:
     lambda_runtime = aws_lambda.Runtime.PYTHON_3_11
     if runtime != None:
         if runtime == "3.7":
@@ -95,7 +101,9 @@ def get_pythonruntime(runtime: str):
     return(lambda_runtime)
 
 
-def get_noderuntime(runtime: str):
+
+
+def get_noderuntime(runtime: str) -> aws_lambda.Runtime:
     lambda_runtime = aws_lambda.Runtime.NODEJS_18_X
     if runtime != None:
         if runtime == "10":
@@ -115,7 +123,7 @@ def get_noderuntime(runtime: str):
     return(lambda_runtime)
 
 
-def get_javaruntime(runtime: str):
+def get_javaruntime(runtime: str) -> aws_lambda.Runtime:
     lambda_runtime = aws_lambda.Runtime.JAVA_11
     if runtime != None:
         if runtime == "8":
@@ -128,6 +136,37 @@ def get_javaruntime(runtime: str):
             lambda_runtime = aws_lambda.Runtime.JAVA_21
     return(lambda_runtime)
 
+
+
+@jsii.implements(ILocalBundling)
+class PythonLambdaBundle:
+
+    def __init__(self, path: str):
+        self.sourcepath = path
+
+    def try_bundle(self, output_dir, *, image, entrypoint=None, command=None, volumes=None, volumesFrom=None, environment=None, workingDirectory=None, user=None, local=None, outputType=None, securityOpt=None, network=None, bundlingFileAccess=None, platform=None):
+        base_dir = os.path.dirname(os.path.dirname(__file__))
+        source_dir = os.path.join(base_dir, self.sourcepath)
+
+        can_run_locally = True # TODO: replace with actual logic
+        if can_run_locally:
+            # Lokaali build
+            print(f"local build lambda '{source_dir}' -> '{output_dir}'")
+
+            print(f"command = 'pip install -r {source_dir}/requirements.txt -t {output_dir}/asset-output'")
+            r = subprocess.run(["pip", "install", "-r", f"{source_dir}/requirements.txt", "-t", f"{output_dir}/asset-output"], capture_output = True) 
+            if r.returncode != 0:
+                print(f"local build lambda '{source_dir}' -> '{output_dir}': pip failed: stdout = '{r.stdout}', stderr = '{r.stderr}'")
+                return False
+
+            print(f"command = 'cp -auv {source_dir}/* {output_dir}/asset-output/'")
+            r = subprocess.run(["cp", "-auv"] + glob.glob(f"{self.sourcepath}/*") + [f"{output_dir}/asset-output/"], capture_output=True)
+            if r.returncode != 0:
+                print(f"local build lambda '{source_dir}' -> '{output_dir}': cp failed: stdout = '{r.stdout}', stderr = '{r.stderr}'")
+                return False
+
+            return True
+        return False
 
 
 
@@ -146,37 +185,73 @@ class PythonLambdaFunction(Construct):
                  scope: Construct, 
                  id: str, 
                  path: str,
-                 index: str,
+                 # index: str,
                  handler: str,
                  description: str,
                  role: aws_iam.Role,
                  props: LambdaProperties,
                  project_tag: str,
-                 runtime: str = None,
-                 layers: list[aws_lambda.LayerVersion] = None
+                 runtime: str = None
+                 #, layers: list[aws_lambda.LayerVersion] = None
                  ):
         super().__init__(scope, id)
 
 
+        python_runtime = get_pythonruntime(runtime)
 
-        self.function = aws_lambda_python_alpha.PythonFunction(
-            self, 
-            id,
-            function_name = id,
-            description = description,
-            runtime = get_pythonruntime(runtime),
-            entry = path,
-            index = index,
-            handler = handler,
-            role = role,
-            vpc = props.vpc,
-            security_groups = props.securitygroups,
-            timeout = props.timeout_min,
-            memory_size = props.memory_mb,
-            environment = props.environment,
-            log_retention = aws_logs.RetentionDays.THREE_MONTHS,
-            layers = layers
-            )
+
+
+
+
+
+        func_code = aws_lambda.Code.from_asset(path = path,
+                                               bundling = BundlingOptions(
+                                                   command = [
+                                                       "bash",
+                                                       "-c",
+                                                       "pip install -r requirements.txt -t /asset-output && cp -au . /asset-output"
+                                                   ],
+                                                   image = python_runtime.bundling_image
+                                                   ,
+                                                   local = PythonLambdaBundle(path = path)
+                                               )
+                                              )
+        
+        self.function = aws_lambda.Function(self,
+                                            id,
+                                            function_name = id,
+                                            description = description,
+                                            code = func_code,
+                                            vpc = props.vpc,
+                                            vpc_subnets = props.subnets,
+                                            security_groups = props.securitygroups,
+                                            log_retention = aws_logs.RetentionDays.THREE_MONTHS,
+                                            handler = handler,
+                                            runtime = python_runtime,
+                                            timeout = props.timeout_min,
+                                            memory_size = props.memory_mb,
+                                            environment = props.environment,
+                                            role = role
+                                           )
+
+        # self.function = aws_lambda_python_alpha.PythonFunction(
+        #     self, 
+        #     id,
+        #     function_name = id,
+        #     description = description,
+        #     runtime = python_runtime,
+        #     entry = path,
+        #     index = index,
+        #     handler = handler,
+        #     role = role,
+        #     vpc = props.vpc,
+        #     security_groups = props.securitygroups,
+        #     timeout = props.timeout_min,
+        #     memory_size = props.memory_mb,
+        #     environment = props.environment,
+        #     log_retention = aws_logs.RetentionDays.THREE_MONTHS,
+        #     layers = layers
+        #     )
 
         add_tags(self.function, props.tags, project_tag = project_tag)
         add_schedule(self, self.function, id, props.schedule)

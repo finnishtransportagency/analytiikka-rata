@@ -116,32 +116,30 @@ class AnalytiikkaServicesStack(Stack):
         #     description ='PyPi python modules'
         # )
         # 
-        # # Lambda
-        # vaihdedata_process_eventsignal = PythonLambdaFunction(self,
-        #                      id = "vaihdedata_process_eventsignal",
-        #                      path = "lambda/vaihdedata_process_eventsignal",
-        #                      index = "vaihdedata_process_eventsignal.py",
-        #                      handler = "vaihdedata_process_eventsignal.lambda_handler",
-        #                      description = "Makes parquet-files from wav.gz and json",
-        #                      role = lambda_role,
-        #                      runtime = "3.7",
-        #                      layers = [ layer_numpy_pandas_pyarrow ],
-        #                      props = LambdaProperties(timeout_min = 1,
-        #                                               memory_mb = 512,
-        #                                               environment = {
-        #                                                   "ATHENA_DATABASE":   f"vaihdedata-{environment}",
-        #                                                   "DEBUG_BUCKET":      f"rata-vaihdedata-vrfleetcare-failedinput-{environment}",
-        #                                                   "DELAY_FOR_JSON":    "1",
-        #                                                   "DEST_BUCKET":       f"rata-vaihdedata-dw-{environment}",
-        #                                                   "DEST_RAW_BUCKET":   f"rata-vaihdedata-raw-{environment}",
-        #                                                   "LIMIT_SAMPLE":      "True",
-        #                                                   "RETRY_FOR_JSON":    "10",
-        #                                                   "SAMPLE_MAX_LENGTH": "15",
-        #                                                   "TOO_LONG_PREFIX":   "too-long/"
-        #                                               },
-        #                                               securitygroups = [ lambda_securitygroup ]
-        #                                              )
-        #                     )
+        # Lambda
+        vaihdedata_process_eventsignal = PythonLambdaFunction(self,
+                             id = "vaihdedata_process_eventsignal",
+                             path = "lambda/vaihdedata_process_eventsignal",
+                             handler = "vaihdedata_process_eventsignal.lambda_handler",
+                             description = "Makes parquet-files from wav.gz and json",
+                             role = lambda_role,
+                             runtime = "3.7",
+                             project_tag = "Vaihteiden kunnonvalvonta",
+                             props = LambdaProperties(timeout_min = 1,
+                                                      memory_mb = 512,
+                                                      environment = {
+                                                          "ATHENA_DATABASE":   f"vaihdedata-{environment}",
+                                                          "DEBUG_BUCKET":      f"rata-vaihdedata-vrfleetcare-failedinput-{environment}",
+                                                          "DELAY_FOR_JSON":    "1",
+                                                          "DEST_BUCKET":       f"rata-vaihdedata-dw-{environment}",
+                                                          "DEST_RAW_BUCKET":   f"rata-vaihdedata-raw-{environment}",
+                                                          "LIMIT_SAMPLE":      "True",
+                                                          "RETRY_FOR_JSON":    "10",
+                                                          "SAMPLE_MAX_LENGTH": "15",
+                                                          "TOO_LONG_PREFIX":   "too-long/"
+                                                      }
+                                                     )
+                            )
         # 
         # # Oikeudet toisen tilin bukettiin
         # vaihdedata_process_eventsignal.function.add_to_role_policy(
