@@ -210,6 +210,7 @@ class PythonLambdaFunction(Construct):
         """
         Normaalisti local build.
         Jos annetty layer niin poistetaan local build
+        Lokaalin kanssa kaatuu asennukseen jos kirjastojen koko on tarpeeksi suuri
         """
         local_bundle = PythonLambdaBundle(path = path)
         if layers != None:
@@ -220,7 +221,7 @@ class PythonLambdaFunction(Construct):
                                                    command = [
                                                        "bash",
                                                        "-c",
-                                                       "pip install -r requirements.txt -t /asset-output && cp -au . /asset-output"
+                                                       "if [ -f requirements.txt ]; then  pip install -r requirements.txt -t /asset-output ; fi && cp -au . /asset-output"
                                                    ],
                                                    image = python_runtime.bundling_image,
                                                    local = local_bundle
