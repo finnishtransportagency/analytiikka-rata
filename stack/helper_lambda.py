@@ -168,6 +168,13 @@ class PythonLambdaBundle:
                 print(f"local build lambda '{source_dir}' -> '{output_dir}': pip failed: stdout = '{r.stdout}', stderr = '{r.stderr}'")
                 return False
 
+            print(f"command = 'rm -r {output_dir}/asset-output/*.dist-info {output_dir}/asset-output/__pycache__'")
+            r = subprocess.run(["pip", "install", "-r", f"{source_dir}/requirements.txt", "-t", f"{output_dir}/asset-output"], capture_output = True) 
+            if r.returncode != 0:
+                print(f"local build lambda '{source_dir}' -> '{output_dir}': pip failed: stdout = '{r.stdout}', stderr = '{r.stderr}'")
+                return False
+
+
             print(f"command = 'cp -auv {source_dir}/* {output_dir}/asset-output/'")
             r = subprocess.run(["cp", "-auv"] + glob.glob(f"{self.sourcepath}/*") + [f"{output_dir}/asset-output/"], capture_output=True)
             if r.returncode != 0:

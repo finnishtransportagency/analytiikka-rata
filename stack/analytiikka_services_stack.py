@@ -117,6 +117,9 @@ class AnalytiikkaServicesStack(Stack):
             description = "Python modules numpy, pandas, pyarrow"
         )
 
+        # Rooli
+        # vaihdedata_role = aws_iam.Role.from_role_name(self, "VaihdedataLambdaRole", role_name = "vaihdedata-lambda-role")
+
         # Lambda
         vaihdedata_process_eventsignal = PythonLambdaFunction(self,
                              id = "vaihdedata_process_eventsignal",
@@ -142,40 +145,45 @@ class AnalytiikkaServicesStack(Stack):
                                                       }
                                                      )
                             )
-         
-        # Oikeudet toisen tilin bukettiin
-        vaihdedata_process_eventsignal.function.add_to_role_policy(
-            aws_iam.PolicyStatement(
-                effect = aws_iam.Effect.ALLOW,
-                actions = [ "s3:GetObject*",
-                            "s3:DeleteObject*",
-                            "s3:PutObject",
-                            "s3:GetBucket*",
-                            "s3:ListAllMyBuckets",
-                            "s3:ListBucket"
-                           ],
-                resources = [
-                    f"arn:aws:s3:::rata-vaihdedata-dw-{environment}/*'",
-                    f"arn:aws:s3:::rata-vaihdedata-raw-{environment}/*'"
-                ]
-            )
-        )
-        # 
-        # # Bucket lookup
-        # vaihdedata_source_bucket = aws_s3.Bucket.from_bucket_name(self, "vaihdedata-source-bucket", bucket_name = f"rata-vaihdedata-vrfleetcare-vayla-{environment}")
-        # 
-        # # S3 event
-        # vaihdedata_process_eventsignal.function.add_event_source(
-        #     aws_lambda_event_sources.S3EventSource(
-        #         vaihdedata_source_bucket,
-        #         events = [aws_s3.EventType.OBJECT_CREATED],
-        #         filters = [
-        #             aws_s3.NotificationKeyFilter(
-        #                 suffix = ".wav.gz"
-        #             )
+
+        # HUOM: Tämä lisää inline policyn olemassa olevaan rooliin.
+        #       Ei toimi jos pitää lisätä monessa paikassa.
+        #       => Jos lambda tarvitsee muista poikkeavat oikeudet niin parempi tehdä erillisen roolin kautta 
+        # # Oikeudet toisen tilin bukettiin
+        # vaihdedata_process_eventsignal.function.add_to_role_policy(
+        #     aws_iam.PolicyStatement(
+        #         sid = "AllowS3Vaihdedata",
+        #         effect = aws_iam.Effect.ALLOW,
+        #         actions = [ "s3:GetObject*",
+        #                     "s3:DeleteObject*",
+        #                     "s3:PutObject",
+        #                     "s3:GetBucket*",
+        #                     "s3:ListAllMyBuckets",
+        #                     "s3:ListBucket"
+        #                    ],
+        #         resources = [
+        #             f"arn:aws:s3:::rata-vaihdedata-dw-{environment}/*'",
+        #             f"arn:aws:s3:::rata-vaihdedata-raw-{environment}/*'"
         #         ]
         #     )
         # )
+        
+        # Bucket lookup
+        # vaihdedata_source_bucket = aws_s3.Bucket.from_bucket_name(self, "vaihdedata-source-bucket", bucket_name = f"rata-vaihdedata-vrfleetcare-vayla-{environment}")
+        vaihdedata_source_bucket = aws_s3.Bucket.from_bucket_name(self, "vaihdedata-source-bucket", bucket_name = f"tiedonkaytto-{environment}")
+        #
+        # S3 event
+        vaihdedata_process_eventsignal.function.add_event_source(
+            aws_lambda_event_sources.S3EventSource(
+                vaihdedata_source_bucket,
+                events = [aws_s3.EventType.OBJECT_CREATED],
+                filters = [
+                    aws_s3.NotificationKeyFilter(
+                        suffix = ".wav.gz"
+                    )
+                ]
+            )
+        )
 
 
 
