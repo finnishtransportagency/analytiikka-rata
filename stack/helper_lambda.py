@@ -137,7 +137,16 @@ def get_javaruntime(runtime: str) -> aws_lambda.Runtime:
     return(lambda_runtime)
 
 
+"""
 
+Lokaali build
+
+Luokan parametri path = lambdan lokaali polku
+
+TODO: 
+TODO: python version tarkastus ?
+
+"""
 @jsii.implements(ILocalBundling)
 class PythonLambdaBundle:
 
@@ -182,27 +191,30 @@ Jos tarvitaan layer: https://github.com/aws-samples/aws-cdk-examples/blob/master
 class PythonLambdaFunction(Construct):
 
     def __init__(self,
-                 scope: Construct, 
-                 id: str, 
+                 scope: Construct,
+                 id: str,
                  path: str,
-                 # index: str,
                  handler: str,
                  description: str,
                  role: aws_iam.Role,
                  props: LambdaProperties,
                  project_tag: str,
-                 runtime: str = None
-                 #, layers: list[aws_lambda.LayerVersion] = None
+                 runtime: str = None,
+                 layers: list[aws_lambda.LayerVersion] = None
                  ):
         super().__init__(scope, id)
 
 
         python_runtime = get_pythonruntime(runtime)
 
-
-
-
-
+        """
+        Normaalisti local build.
+        Jos annetty layer niin poistetaan local build
+        """
+        local_bundle = PythonLambdaBundle(path = path)
+        if layers != None:
+            if len(layers) > 0:
+                local_bundle = None
 
         func_code = aws_lambda.Code.from_asset(path = path,
                                                bundling = BundlingOptions(
@@ -211,9 +223,8 @@ class PythonLambdaFunction(Construct):
                                                        "-c",
                                                        "pip install -r requirements.txt -t /asset-output && cp -au . /asset-output"
                                                    ],
-                                                   image = python_runtime.bundling_image
-                                                   ,
-                                                   local = PythonLambdaBundle(path = path)
+                                                   image = python_runtime.bundling_image,
+                                                   local = local_bundle
                                                )
                                               )
         
@@ -231,7 +242,8 @@ class PythonLambdaFunction(Construct):
                                             timeout = props.timeout_min,
                                             memory_size = props.memory_mb,
                                             environment = props.environment,
-                                            role = role
+                                            role = role,
+                                            layers = layers
                                            )
 
         # self.function = aws_lambda_python_alpha.PythonFunction(

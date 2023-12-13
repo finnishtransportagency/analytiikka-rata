@@ -101,21 +101,21 @@ class AnalytiikkaServicesStack(Stack):
 
 
 
-        # # VAIHDEDATA POHJA
-        # # Layer
-        # layer_numpy_pandas_pyarrow_asset = BuildPyLayerAsset.from_pypi(self, "NumpyPandasPyarrowLayerAsset",
-        #     pypi_requirements=["numpy", "pandas", "pyarrow"],
-        #     py_runtime=aws_lambda.Runtime.PYTHON_3_7,
-        # )
-        # 
-        # layer_numpy_pandas_pyarrow = aws_lambda.LayerVersion(
-        #     self,
-        #     id = "NumpyPandasPyarrowLayer",
-        #     code = aws_lambda.Code.from_bucket(layer_numpy_pandas_pyarrow_asset.asset_bucket, layer_numpy_pandas_pyarrow_asset.asset_key),
-        #     compatible_runtimes = [aws_lambda.Runtime.PYTHON_3_7],
-        #     description ='PyPi python modules'
-        # )
-        # 
+        # VAIHDEDATA POHJA
+        # Layer
+        layer_numpy_pandas_pyarrow_asset = BuildPyLayerAsset.from_pypi(self, "NumpyPandasPyarrowLayerAsset",
+            pypi_requirements=["numpy", "pandas", "pyarrow"],
+            py_runtime=aws_lambda.Runtime.PYTHON_3_7,
+        )
+
+        layer_numpy_pandas_pyarrow = aws_lambda.LayerVersion(
+            self,
+            id = "NumpyPandasPyarrowLayer",
+            code = aws_lambda.Code.from_bucket(layer_numpy_pandas_pyarrow_asset.asset_bucket, layer_numpy_pandas_pyarrow_asset.asset_key),
+            compatible_runtimes = [aws_lambda.Runtime.PYTHON_3_7],
+            description ='PyPi python modules'
+        )
+
         # Lambda
         vaihdedata_process_eventsignal = PythonLambdaFunction(self,
                              id = "vaihdedata_process_eventsignal",
