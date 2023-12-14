@@ -307,16 +307,14 @@ class JavaLambdaBundle:
             # Lokaali build
             print(f"local build lambda '{source_dir}' -> '{output_dir}'")
 
-            # mvn -f tutorials/ clean compile
             print(f"command = 'mvn -f {source_dir}/ clean install")
             r = subprocess.run(["mvn", "-f", f"{source_dir}/", "clean", "install"], capture_output = True) 
             print(f"local build lambda, mvn done ({r.returncode}): stdout = '{r.stdout}', stderr = '{r.stderr}'")
             if r.returncode != 0:
                 return False
 
-            # cp ./target/{jarname} /asset-output/
-            print(f"command = 'cp -auv {source_dir}/target/{self.jarname} {output_dir}/asset-output/'")
-            r = subprocess.run(["cp", "-auv", f"{source_dir}/target/{self.jarname}", f"{output_dir}/asset-output/"], capture_output=True)
+            print(f"command = 'cp -auv {source_dir}/target/{self.jarname} {output_dir}/'")
+            r = subprocess.run(["cp", "-auv", f"{source_dir}/target/{self.jarname}", f"{output_dir}/"], capture_output=True)
             print(f"local build lambda, cp done ({r.returncode}): stdout = '{r.stdout}', stderr = '{r.stderr}'")
             if r.returncode != 0:
                 return False
@@ -362,7 +360,7 @@ class JavaLambdaFunction(Construct):
                                                        f"mvn clean install && cp ./target/{jarname} /asset-output/",
                                                    ],
                                                    image = aws_lambda.Runtime.JAVA_11.bundling_image,
-                                                   user = "root",
+                                                   # user = "root",
                                                    output_type = BundlingOutput.ARCHIVED,
                                                    local = local_bundle
                                                )
