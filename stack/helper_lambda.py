@@ -1,6 +1,6 @@
 from aws_cdk import (
     aws_lambda,
-    aws_lambda_python_alpha,
+    # aws_lambda_python_alpha,
     aws_events,
     aws_events_targets,
     aws_logs,
@@ -139,7 +139,7 @@ def get_javaruntime(runtime: str) -> aws_lambda.Runtime:
 
 """
 
-Lokaali build
+Lokaali python build
 
 Luokan parametri path = lambdan lokaali polku
 
@@ -164,22 +164,22 @@ class PythonLambdaBundle:
 
             print(f"command = 'pip install -r {source_dir}/requirements.txt -t {output_dir}/asset-output'")
             r = subprocess.run(["pip", "install", "-r", f"{source_dir}/requirements.txt", "-t", f"{output_dir}/asset-output"], capture_output = True) 
+            print(f"local build lambda, pip done ({r.returncode}): stdout = '{r.stdout}', stderr = '{r.stderr}'")
             if r.returncode != 0:
-                print(f"local build lambda '{source_dir}' -> '{output_dir}': pip failed: stdout = '{r.stdout}', stderr = '{r.stderr}'")
                 return False
 
-            remove_list = [ "*.dist-info", "boto*", "dateutil", "jmespath", "pytz", "s3transfer", "tzdata", "urllib*" ]
-            for item in remove_list:
-                print(f"command = 'rm -r {output_dir}/asset-output/{item}'")
-                r = subprocess.run(["rm", "-r"] + glob.glob(f"{output_dir}/asset-output/{item}"), capture_output = True) 
-                if r.returncode != 0:
-                    print(f"local build lambda '{source_dir}' -> '{output_dir}': rm failed: stdout = '{r.stdout}', stderr = '{r.stderr}'")
-                    return False
+            # remove_list = [ "*.dist-info", "boto*", "dateutil", "jmespath", "pytz", "s3transfer", "tzdata", "urllib*" ]
+            # for item in remove_list:
+            #     print(f"command = 'rm -r {output_dir}/asset-output/{item}'")
+            #     r = subprocess.run(["rm", "-r"] + glob.glob(f"{output_dir}/asset-output/{item}"), capture_output = True) 
+            #     if r.returncode != 0:
+            #         print(f"local build lambda '{source_dir}' -> '{output_dir}': rm failed: stdout = '{r.stdout}', stderr = '{r.stderr}'")
+            #         return False
 
             print(f"command = 'cp -auv {source_dir}/* {output_dir}/asset-output/'")
             r = subprocess.run(["cp", "-auv"] + glob.glob(f"{self.sourcepath}/*") + [f"{output_dir}/asset-output/"], capture_output=True)
+            print(f"local build lambda, cp done ({r.returncode}): stdout = '{r.stdout}', stderr = '{r.stderr}'")
             if r.returncode != 0:
-                print(f"local build lambda '{source_dir}' -> '{output_dir}': cp failed: stdout = '{r.stdout}', stderr = '{r.stderr}'")
                 return False
 
             return True
@@ -282,6 +282,52 @@ class PythonLambdaFunction(Construct):
 
 
 """
+
+Lokaali java build
+
+Luokan parametri path = lambdan lokaali polku
+
+TODO: 
+TODO: java version tarkastus ?
+
+"""
+@jsii.implements(ILocalBundling)
+class JavaLambdaBundle:
+
+    def __init__(self, path: str, jarname: str):
+        self.sourcepath = path
+        self.jarname = jarname
+
+    def try_bundle(self, output_dir, *, image, entrypoint=None, command=None, volumes=None, volumesFrom=None, environment=None, workingDirectory=None, user=None, local=None, outputType=None, securityOpt=None, network=None, bundlingFileAccess=None, platform=None):
+        base_dir = os.path.dirname(os.path.dirname(__file__))
+        source_dir = os.path.join(base_dir, self.sourcepath)
+
+        can_run_locally = True # TODO: replace with actual logic
+        if can_run_locally:
+            # Lokaali build
+            print(f"local build lambda '{source_dir}' -> '{output_dir}'")
+
+            # mvn -f tutorials/ clean compile
+            print(f"command = 'mvn -f {source_dir}/ clean install")
+            r = subprocess.run(["mvn", "-f", f"{source_dir}/", "clean", "install"], capture_output = True) 
+            print(f"local build lambda, mvn done ({r.returncode}): stdout = '{r.stdout}', stderr = '{r.stderr}'")
+            if r.returncode != 0:
+                return False
+
+            # cp ./target/{jarname} /asset-output/
+            print(f"command = 'cp -auv {source_dir}/target/{self.jarname} {output_dir}/asset-output/'")
+            r = subprocess.run(["cp", "-auv", f"{source_dir}/target/{self.jarname}", f"{output_dir}/asset-output/"], capture_output=True)
+            print(f"local build lambda, cp done ({r.returncode}): stdout = '{r.stdout}', stderr = '{r.stderr}'")
+            if r.returncode != 0:
+                return False
+
+            return True
+        return False
+
+
+
+
+"""
 Java lambda
 
 HUOM: olettaa että on maven- projekti, java 11
@@ -304,17 +350,32 @@ class JavaLambdaFunction(Construct):
         super().__init__(scope, id)
 
 
+        local_bundle = JavaLambdaBundle(path = path, jarname = jarname)
+        #if layers != None:
+        #    local_bundle = None
+
         func_code = aws_lambda.Code.from_asset(path = path,
-                                               bundling = {
-                                                   "command": [
+                                               bundling = BundlingOptions(
+                                                   command = [
                                                        "bash",
                                                        "-c",
                                                        f"mvn clean install && cp ./target/{jarname} /asset-output/",
-                                                    ],
-                                                    "image": aws_lambda.Runtime.JAVA_11.bundling_image,
-                                                    "user": "root",
-                                                    "output_type": BundlingOutput.ARCHIVED
-                                               }
+                                                   ],
+                                                   image = aws_lambda.Runtime.JAVA_11.bundling_image,
+                                                   user = "root",
+                                                   output_type = BundlingOutput.ARCHIVED,
+                                                   local = local_bundle
+                                               )
+                                               # bundling = {
+                                               #     "command": [
+                                               #         "bash",
+                                               #         "-c",
+                                               #         f"mvn clean install && cp ./target/{jarname} /asset-output/",
+                                               #      ],
+                                               #      "image": aws_lambda.Runtime.JAVA_11.bundling_image,
+                                               #      "user": "root",
+                                               #      "output_type": BundlingOutput.ARCHIVED
+                                               # }
                                               )
         
         self.function = aws_lambda.Function(self,
@@ -343,6 +404,8 @@ class JavaLambdaFunction(Construct):
 Node.js lambda
 
 Runtime = 18.x
+
+HUOM: pitää lisätä kirjastojen asennus ja lokaali build
 
 """
 class NodejsLambdaFunction(Construct):
